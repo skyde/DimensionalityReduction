@@ -68,7 +68,7 @@ public class ReadMNISTData : MonoBehaviour
 
 	public void OnDrawGizmos()
 	{
-		if(Category.Length == 0)
+		if(Category == null || Category.Length == 0)
 		{
 			return;
 		}
