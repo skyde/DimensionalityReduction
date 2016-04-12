@@ -49,6 +49,8 @@ public class VisualizeData : MonoBehaviour
 				p.Visualize = Instantiate(VisualizePoint) as GameObject;
 				p.Visualize.GetComponent<MeshRenderer>().material.color = category.Color;
 				p.Visualize.transform.parent = transform;
+				var c = p.Visualize.AddComponent<EntryContainer>();
+				c.Entry = p.Entry;
 
 				points.Add(p);
 			}
@@ -126,7 +128,7 @@ public class VisualizeData : MonoBehaviour
 		{
 			for (int a = 0; a < Points.Length; a++) 
 			{
-				for (int b = 0; b < Points.Length; b++) 
+				for (int b = a; b < Points.Length; b++) 
 				{
 					if(a == b)
 					{
@@ -138,7 +140,7 @@ public class VisualizeData : MonoBehaviour
 
 					var diff = aP.Position - bP.Position;
 					var d = diff.magnitude;
-					var dir = diff.normalized;
+					var dir = diff / d;//diff.normalized;
 
 					if(d == 0)
 					{
@@ -198,7 +200,8 @@ public class VisualizeData : MonoBehaviour
 	public bool DisplayConnections = false;
 	public float PointAlpha = 0.02F;
 	public float PointDistanceScale = 5;
-	public Color LineColor = new Color(1, 1, 1, 0.2F);
+	[Range(0, 1)]
+	public float ConnectionAlpha = 0.5F;
 
 	public void OnDrawGizmos()
 	{
@@ -217,7 +220,13 @@ public class VisualizeData : MonoBehaviour
 					var dist = (point.Position - p.Position).magnitude;
 //					var t = 0.5F + ((float) c.Distance - dist) / PointDistanceScale;
 
-					Gizmos.color = Color.Lerp(point.Color, p.Color, 0.5F);
+					var col = Color.Lerp(point.Color, p.Color, ConnectionAlpha);
+
+					col = new Color(col.r, col.g, col.b, ConnectionAlpha);
+
+					Gizmos.color = col;
+
+
 
 //					var tar = Vector3.Lerp(point.Position, p.Position, 0.5F);
 					Gizmos.DrawLine(point.Position, p.Position);

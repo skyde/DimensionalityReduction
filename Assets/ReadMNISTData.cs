@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using UnityEngine.Assertions;
 
 //[System.Serializable]
+using UnityEditor;
+
+
 public class Entry
 {
 	public double[] Values;
@@ -74,12 +77,23 @@ public class ReadMNISTData : MonoBehaviour
 
 	public void OnDrawGizmos()
 	{
-		if(!PreviewEnabled || Category == null || Category.Length == 0)
+		Entry entry = null;
+		if(Selection.activeGameObject)//!PreviewEnabled || Category == null || Category.Length == 0)
+		{
+			var c = Selection.activeGameObject.GetComponent<EntryContainer>();
+
+			if(c)
+			{
+				entry = c.Entry;
+			}
+		}
+
+		if(entry == null)
 		{
 			return;
 		}
 
-		var values = Category[PreviewCategory].Entry[PreviewEntry].Values;
+		var values = entry.Values;
 
 		var iter = 28;
 		float step = 0.1F;
