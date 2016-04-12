@@ -147,7 +147,7 @@ public class VisualizeData : MonoBehaviour
 						continue;
 					}
 					// 
-					var impulse = dir * (1F / (Mathf.Sqrt(d))) * Repulse * 0.0001F;
+					var impulse = dir * (1F / (d * d)) * Repulse * 0.0001F;
 
 					aP.Velocity += impulse;
 					bP.Velocity -= impulse;
