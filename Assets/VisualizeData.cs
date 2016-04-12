@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 
-//[System.Serializable]
 public class VisualizePoint
 {
 	public Color Color;
@@ -51,6 +50,17 @@ public class VisualizeData : MonoBehaviour
 				}
 
 				p.Position = Random.insideUnitSphere;
+
+				// Caculate distance
+				var v = 0.0;
+				for (int x = 0; x < point.Entry.Values.Length; x++) 
+				{
+					var d = (point.Entry.Values[x] - p.Entry.Values[x]);
+					v += d * d;
+				}
+
+				v = System.Math.Sqrt(v);
+				point.Distances[i] = v;
 			}
 		}
 	}
