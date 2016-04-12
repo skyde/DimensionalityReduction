@@ -2,10 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public struct Connection
+{
+	public Connection(int index, double distance)
+	{
+		this.Index = index;
+		this.Distance = distance;
+	}
+	
+	public int Index;
+	public double Distance;
+}
+
 public class VisualizePoint
 {
 	public Color Color;
-	public double[] Distances;
+	public Connection[] Connections;
 	public Entry Entry;
 	public Vector3 Position;
 	public Vector3 Velocity;
@@ -18,6 +30,8 @@ public class VisualizeData : MonoBehaviour
 	public ReadMNISTData Data;
 	public VisualizePoint[] Points = new VisualizePoint[0];
 	public GameObject VisualizePoint;
+
+	public int Connections = 3;
 
 	public void Start()
 	{
@@ -44,18 +58,24 @@ public class VisualizeData : MonoBehaviour
 
 		foreach (var point in Points) 
 		{
-			point.Distances = new double[Points.Length];
+			point.Position = Random.insideUnitSphere;
+			 
+			point.Connections = new Connection[Connections];
 
-			for (int i = 0; i < point.Distances.Length; i++) 
+			for (int p = 0; p < point.Connections.Length; p++) 
+			{
+				point.Connections[p].Distance = double.MaxValue;
+				point.Connections[p].Index = -1;
+			}
+
+			for (int i = 0; i < Points.Length; i++) 
 			{
 				var p = Points[i];
 
 				if(p == point)
 				{
-					p.Distances[i] = 0;
+					continue;
 				}
-
-				p.Position = Random.insideUnitSphere;
 
 				// Caculate distance
 				var v = 0.0;
@@ -67,11 +87,23 @@ public class VisualizeData : MonoBehaviour
 
 				v = System.Math.Sqrt(v);
 
-//				v = Mathf.;//System.Math.Log(v);
-//				v = System.Math.Sqrt(v);
-//				v = System.Math.Sqrt(v);
-//				v = System.Math.Sqrt(v);
-				point.Distances[i] = v;
+				var highest = -1.0;
+				var highestIndex = -1;
+				for (int c = 0; c < point.Connections.Length; c++) 
+				{
+					if(point.Connections[c].Distance > highest)
+					{
+						highest = point.Connections[c].Distance;
+						highestIndex = c;
+					}
+				}
+
+				if(highest > v)
+				{
+					point.Connections[highestIndex] = new Connection(i, v);
+				}
+
+//				point.Connections[i] = new Connection(;
 			}
 		}
 	}
@@ -81,6 +113,8 @@ public class VisualizeData : MonoBehaviour
 	public float Damping = 0.96F;
 	public float DistanceScalar = 1;
 
+	public float Repulse = 1F;
+
 	public void Update () 
 	{
 		if(!Simulate)
@@ -88,13 +122,47 @@ public class VisualizeData : MonoBehaviour
 			return;
 		}
 
+		if(Repulse != 0)
+		{
+			for (int a = 0; a < Points.Length; a++) 
+			{
+				for (int b = 0; b < Points.Length; b++) 
+				{
+					if(a == b)
+					{
+						continue;
+					}
+
+					var aP = Points[a];
+					var bP = Points[b];
+
+					var diff = aP.Position - bP.Position;
+					var d = diff.magnitude;
+					var dir = diff.normalized;
+
+					if(d == 0)
+					{
+						continue;
+					}
+					// 
+					var impulse = dir * (1F / (Mathf.Sqrt(d))) * Repulse * 0.0001F;
+
+					aP.Velocity += impulse;
+					bP.Velocity -= impulse;
+				}
+			}
+		}
+
 		for (int a = 0; a < Points.Length; a++) 
 		{
-			for (int b = 0; b < Points[a].Distances.Length; b++)
+			for (int b = 0; b < Points[a].Connections.Length; b++)
 			{
-				var desired = (float) Points[a].Distances[b] * DistanceScalar;
+				var connection = Points[a].Connections[b];
+				var targetPoint = Points[connection.Index];
 
-				var diff = Points[b].Position - Points[a].Position;
+				var desired = (float) connection.Distance * DistanceScalar;
+
+				var diff = targetPoint.Position - Points[a].Position;
 				var d = diff.magnitude;
 				d -= desired;
 
@@ -103,6 +171,7 @@ public class VisualizeData : MonoBehaviour
 				var impulse = norm * d * Stiffness * 0.0001F;
 
 				Points[a].Velocity += impulse;
+				Points[connection.Index].Velocity -= impulse;
 			}
 
 			Points[a].Visualize.transform.position = Points[a].Position;
@@ -129,26 +198,29 @@ public class VisualizeData : MonoBehaviour
 	public bool DisplayConnections = false;
 	public float PointAlpha = 0.02F;
 	public float PointDistanceScale = 5;
+	public Color LineColor = new Color(1, 1, 1, 0.2F);
 
 	public void OnDrawGizmos()
 	{
-		var a = new Color(0, 0, 1, PointAlpha);
-		var b = new Color(1, 0, 0, PointAlpha);
+//		var a = new Color(0, 0, 1, PointAlpha);
+//		var b = new Color(1, 0, 0, PointAlpha);
+
 
 		foreach (var point in Points) 
 		{
 			if(DisplayConnections)
 			{
-				for (int i = 0; i < point.Distances.Length; i++)
+				for (int i = 0; i < point.Connections.Length; i++)
 				{
-					var p = Points[i];
+					var c = point.Connections[i];
+					var p = Points[c.Index];
 					var dist = (point.Position - p.Position).magnitude;
-					var t = 0.5F + ((float) point.Distances[i] - dist) / PointDistanceScale;
+//					var t = 0.5F + ((float) c.Distance - dist) / PointDistanceScale;
 
-					Gizmos.color = Color.Lerp(a, b, t);
+					Gizmos.color = Color.Lerp(point.Color, p.Color, 0.5F);
 
-					var tar = Vector3.Lerp(point.Position, p.Position, 0.5F);
-					Gizmos.DrawLine(point.Position, tar);
+//					var tar = Vector3.Lerp(point.Position, p.Position, 0.5F);
+					Gizmos.DrawLine(point.Position, p.Position);
 				}
 			}
 
