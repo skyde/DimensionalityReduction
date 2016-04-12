@@ -8,8 +8,8 @@ public class VisualizePoint
 	public Color Color;
 	public double[] Distances;
 	public Entry Entry;
-	public Vector2 Position;
-	public Vector2 Velocity;
+	public Vector3 Position;
+	public Vector3 Velocity;
 }
 
 public class VisualizeData : MonoBehaviour 

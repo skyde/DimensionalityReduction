@@ -32,7 +32,11 @@ public class ReadMNISTData : MonoBehaviour
 
 		for (int i = 0; i < Datas.Length; i++)
 		{
-			category.Add(LoadData(Datas[i]));
+			var c = LoadData(Datas[i]);
+
+			c.Color = new HSBColor(i / (float) Datas.Length, 1, 1).ToColor();
+
+			category.Add(c);
 		}
 
 		Category = category.ToArray();
@@ -64,12 +68,13 @@ public class ReadMNISTData : MonoBehaviour
 		return category;
 	}
 
+	public bool PreviewEnabled = true;
 	public int PreviewCategory = 0;
 	public int PreviewEntry = 0;
 
 	public void OnDrawGizmos()
 	{
-		if(Category == null || Category.Length == 0)
+		if(!PreviewEnabled || Category == null || Category.Length == 0)
 		{
 			return;
 		}
