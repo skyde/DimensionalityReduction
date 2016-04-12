@@ -9,6 +9,7 @@ public class VisualizePoint
 	public Entry Entry;
 	public Vector3 Position;
 	public Vector3 Velocity;
+	public GameObject Visualize;
 }
 
 public class VisualizeData : MonoBehaviour 
@@ -16,6 +17,7 @@ public class VisualizeData : MonoBehaviour
 	public int DisplayPerCategory = 100;
 	public ReadMNISTData Data;
 	public VisualizePoint[] Points = new VisualizePoint[0];
+	public GameObject VisualizePoint;
 
 	public void Start()
 	{
@@ -29,6 +31,9 @@ public class VisualizeData : MonoBehaviour
 
 				p.Color = category.Color;
 				p.Entry = category.Entry[i];
+
+				p.Visualize = Instantiate(VisualizePoint) as GameObject;
+				p.Visualize.GetComponent<MeshRenderer>().material.color = category.Color;
 
 				points.Add(p);
 			}
@@ -61,9 +66,6 @@ public class VisualizeData : MonoBehaviour
 
 				v = System.Math.Sqrt(v);
 				point.Distances[i] = v;
-
-//				if(i == 0)
-//				print(v);
 			}
 		}
 	}
@@ -89,14 +91,14 @@ public class VisualizeData : MonoBehaviour
 				var d = diff.magnitude;
 				d -= desired;
 
-//				d = (d * d * d);
-
 				var norm = diff.normalized;//d == 0 ? Vector3.zero : diff / d;
 
 				var impulse = norm * d * Stiffness * 0.0001F;
 
 				Points[a].Velocity += impulse;
 			}
+
+			Points[a].Visualize.transform.position = Points[a].Position;
 		}
 //		foreach (var point in Points) 
 //		{
@@ -141,8 +143,8 @@ public class VisualizeData : MonoBehaviour
 				}
 			}
 
-			Gizmos.color = point.Color;
-			Gizmos.DrawSphere(point.Position, PointSize);
+//			Gizmos.color = point.Color;
+//			Gizmos.DrawSphere(point.Position, PointSize);
 		}
 	}
 }
