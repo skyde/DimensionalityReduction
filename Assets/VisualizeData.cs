@@ -46,7 +46,7 @@ public class VisualizeData : MonoBehaviour
 		{
 			point.Distances = new double[Points.Length];
 
-			for (int i = 0; i < Points.Length; i++) 
+			for (int i = 0; i < point.Distances.Length; i++) 
 			{
 				var p = Points[i];
 
@@ -66,6 +66,11 @@ public class VisualizeData : MonoBehaviour
 				}
 
 				v = System.Math.Sqrt(v);
+
+//				v = Mathf.;//System.Math.Log(v);
+//				v = System.Math.Sqrt(v);
+//				v = System.Math.Sqrt(v);
+//				v = System.Math.Sqrt(v);
 				point.Distances[i] = v;
 			}
 		}
@@ -85,13 +90,8 @@ public class VisualizeData : MonoBehaviour
 
 		for (int a = 0; a < Points.Length; a++) 
 		{
-			for (int b = 0; b < Points.Length; b++)
+			for (int b = 0; b < Points[a].Distances.Length; b++)
 			{
-				if(a == b)
-				{
-					continue;
-				}
-
 				var desired = (float) Points[a].Distances[b] * DistanceScalar;
 
 				var diff = Points[b].Position - Points[a].Position;
