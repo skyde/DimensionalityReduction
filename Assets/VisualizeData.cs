@@ -89,6 +89,8 @@ public class VisualizeData : MonoBehaviour
 				var d = diff.magnitude;
 				d -= desired;
 
+//				d = (d * d * d);
+
 				var norm = diff.normalized;//d == 0 ? Vector3.zero : diff / d;
 
 				var impulse = norm * d * Stiffness * 0.0001F;
@@ -113,12 +115,34 @@ public class VisualizeData : MonoBehaviour
 
 	public float PointSize = 0.1F;
 
+	public bool DisplayConnections = false;
+	public float PointAlpha = 0.02F;
+	public float PointDistanceScale = 5;
+
 	public void OnDrawGizmos()
 	{
-		foreach (var item in Points) 
+		var a = new Color(0, 0, 1, PointAlpha);
+		var b = new Color(1, 0, 0, PointAlpha);
+
+		foreach (var point in Points) 
 		{
-			Gizmos.color = item.Color;
-			Gizmos.DrawSphere(item.Position, PointSize);
+			if(DisplayConnections)
+			{
+				for (int i = 0; i < point.Distances.Length; i++)
+				{
+					var p = Points[i];
+					var dist = (point.Position - p.Position).magnitude;
+					var t = 0.5F + ((float) point.Distances[i] - dist) / PointDistanceScale;
+
+					Gizmos.color = Color.Lerp(a, b, t);
+
+					var tar = Vector3.Lerp(point.Position, p.Position, 0.5F);
+					Gizmos.DrawLine(point.Position, tar);
+				}
+			}
+
+			Gizmos.color = point.Color;
+			Gizmos.DrawSphere(point.Position, PointSize);
 		}
 	}
 }
