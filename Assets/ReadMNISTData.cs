@@ -31,7 +31,7 @@ public class ReadMNISTData : MonoBehaviour
 
 		for (int i = 0; i < Datas.Length; i++)
 		{
-			category.Add(LoadData(Datas[0]));
+			category.Add(LoadData(Datas[i]));
 		}
 
 		Category = category.ToArray();
@@ -62,4 +62,46 @@ public class ReadMNISTData : MonoBehaviour
 
 		return category;
 	}
+
+	public int PreviewCategory = 0;
+	public int PreviewEntry = 0;
+
+	public void OnDrawGizmos()
+	{
+		if(Category.Length == 0)
+		{
+			return;
+		}
+
+		var values = Category[PreviewCategory].Entry[PreviewEntry].Values;
+
+		var iter = 28;
+		float step = 0.1F;
+		for (int x = 0; x < iter; x++) 
+		{
+			for (int y = 0; y < iter; y++) 
+			{
+				var v = 1F - (float) values[y * iter + x];
+				Gizmos.color = new Color(v, v, v, 1);
+
+				Gizmos.DrawCube(new Vector2(x * step, -y * step), new Vector2(step, step));
+			}
+		}
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
