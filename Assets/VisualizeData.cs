@@ -34,6 +34,7 @@ public class VisualizeData : MonoBehaviour
 
 				p.Visualize = Instantiate(VisualizePoint) as GameObject;
 				p.Visualize.GetComponent<MeshRenderer>().material.color = category.Color;
+				p.Visualize.transform.parent = transform;
 
 				points.Add(p);
 			}
@@ -70,12 +71,18 @@ public class VisualizeData : MonoBehaviour
 		}
 	}
 
+	public bool Simulate = true;
 	public float Stiffness = 1F;
 	public float Damping = 0.96F;
 	public float DistanceScalar = 1;
 
 	public void Update () 
 	{
+		if(!Simulate)
+		{
+			return;
+		}
+
 		for (int a = 0; a < Points.Length; a++) 
 		{
 			for (int b = 0; b < Points.Length; b++)
@@ -99,6 +106,8 @@ public class VisualizeData : MonoBehaviour
 			}
 
 			Points[a].Visualize.transform.position = Points[a].Position;
+			Points[a].Visualize.transform.localScale = new Vector3(PointScale, PointScale, PointScale);
+
 		}
 //		foreach (var point in Points) 
 //		{
@@ -115,7 +124,7 @@ public class VisualizeData : MonoBehaviour
 		}
 	}
 
-	public float PointSize = 0.1F;
+	public float PointScale = 1F;
 
 	public bool DisplayConnections = false;
 	public float PointAlpha = 0.02F;
