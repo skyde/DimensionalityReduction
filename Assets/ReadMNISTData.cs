@@ -13,6 +13,7 @@ public class Entry
 //[System.Serializable]
 public class Category
 {
+	public Color Color = Color.white;
 	public Entry[] Entry;
 }
 
